@@ -47,14 +47,42 @@ public class AnimUtils {
         return PropertyValuesHolder.ofFloat(SCALE_Y, values);
     }
 
-//    @SuppressWarnings("NewApi")
+    public static void showMenu(ArcLayout arcLayout, float x, float y) {
+        showMenu(null,arcLayout,x,y);
+    }
+
+    public static void hideMenu(ArcLayout arcLayout, float x, float y) {
+        hideMenu(null,arcLayout,x,y);
+    }
+
+    public static void showMenu(ArcLayout arcLayout, View fab) {
+        showMenu(null,arcLayout,fab.getX(),fab.getY());
+    }
+
+    public static void hideMenu(View menuLayout, ArcLayout arcLayout, View fab) {
+        hideMenu(menuLayout,arcLayout,fab.getX(),fab.getY());
+    }
+
     public static void showMenu(View menuLayout, ArcLayout arcLayout, View fab) {
-        menuLayout.setVisibility(View.VISIBLE);
+        showMenu(menuLayout,arcLayout,fab.getX(),fab.getY());
+    }
+
+    public static void hideMenu(ArcLayout arcLayout, View fab) {
+        hideMenu(null,arcLayout,fab.getX(),fab.getY());
+    }
+
+//    @SuppressWarnings("NewApi")
+//public static void showMenu(View menuLayout, ArcLayout arcLayout, View fab) {
+    public static void showMenu(View menuLayout, ArcLayout arcLayout, float x, float y) {
+
+        if(menuLayout!=null) {
+            menuLayout.setVisibility(View.VISIBLE);
+        }
 
         List<Animator> animList = new ArrayList<>();
 
         for (int i = 0, len = arcLayout.getChildCount(); i < len; i++) {
-            animList.add(createShowItemAnimator(arcLayout.getChildAt(i), fab));
+            animList.add(createShowItemAnimator(arcLayout.getChildAt(i), x,y));
         }
 
         AnimatorSet animSet = new AnimatorSet();
@@ -65,12 +93,13 @@ public class AnimUtils {
     }
 
  //   @SuppressWarnings("NewApi")
-    public static void hideMenu(final View menuLayout, ArcLayout arcLayout, View fab) {
+// public static void hideMenu(final View menuLayout, ArcLayout arcLayout, View fab)
+    public static void hideMenu(final View menuLayout, ArcLayout arcLayout, float x, float y) {
 
         List<Animator> animList = new ArrayList<>();
 
         for (int i = arcLayout.getChildCount() - 1; i >= 0; i--) {
-            animList.add(createHideItemAnimator(arcLayout.getChildAt(i), fab));
+            animList.add(createHideItemAnimator(arcLayout.getChildAt(i), x,y));
         }
 
         AnimatorSet animSet = new AnimatorSet();
@@ -81,7 +110,10 @@ public class AnimUtils {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                menuLayout.setVisibility(View.INVISIBLE);
+                if(menuLayout!=null) {
+                    menuLayout.setVisibility(View.INVISIBLE);
+                }
+
             }
         });
         animSet.start();
@@ -89,9 +121,17 @@ public class AnimUtils {
     }
 
     public static Animator createShowItemAnimator(View item, View fab) {
+        return createShowItemAnimator(item,fab.getX(),fab.getY());
+    }
 
-        float dx = fab.getX() - item.getX();
-        float dy = fab.getY() - item.getY();
+    public static Animator createHideItemAnimator(final View item, View fab) {
+        return createHideItemAnimator(item,fab.getX(),fab.getY());
+    }
+
+    public static Animator createShowItemAnimator(View item, float x, float y) {
+
+        float dx = x - item.getX();
+        float dy = y - item.getY();
 
         item.setRotation(0f);
         item.setTranslationX(dx);
@@ -107,9 +147,9 @@ public class AnimUtils {
         return anim;
     }
 
-    public static Animator createHideItemAnimator(final View item, View fab) {
-        float dx = fab.getX() - item.getX();
-        float dy = fab.getY() - item.getY();
+    public static Animator createHideItemAnimator(final View item, float x, float y) {
+        float dx = x - item.getX();
+        float dy = y - item.getY();
 
         Animator anim = ObjectAnimator.ofPropertyValuesHolder(
                 item,

@@ -270,6 +270,24 @@ public class ArcLayout extends ViewGroup {
         AnimUtils.hideMenu(menuLayout,this,fab);
     }
 
+    public void showMenu(@NonNull View fab){
+        AnimUtils.showMenu(this,fab);
+    }
+
+    public void hideMenu(@NonNull View fab){
+        AnimUtils.hideMenu(this,fab);
+    }
+
+    public void showMenu(float positionX, float positionY){
+        AnimUtils.showMenu(this,positionX,positionY);
+    }
+
+    public void hideMenu(float positionX, float positionY){
+        AnimUtils.hideMenu(this,positionX,positionY);
+    }
+
+    /* End of Praba's Code */
+
     protected void childMeasureBy(View child, int x, int y) {
         if (Utils.DEBUG) {
             Utils.d(TAG, "childMeasureBy: x=%d, y=%d", x, y);
