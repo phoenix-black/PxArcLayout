@@ -128,7 +128,7 @@ public class AnimUtils {
         return createHideItemAnimator(item,fab.getX(),fab.getY());
     }
 
-    public static Animator createShowItemAnimator(View item, float x, float y) {
+    public static Animator createShowItemAnimator(final View item, float x, float y) {
 
         float dx = x - item.getX();
         float dy = y - item.getY();
@@ -144,6 +144,15 @@ public class AnimUtils {
                 AnimUtils.translationY(dy, 0f)
         );
 
+
+        /*anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                item.setVisibility(View.VISIBLE);
+            }
+        });*/
+
         return anim;
     }
 
@@ -156,6 +165,7 @@ public class AnimUtils {
                 AnimUtils.rotation(720f, 0f),
                 AnimUtils.translationX(0f, dx),
                 AnimUtils.translationY(0f, dy)
+
         );
 
         anim.addListener(new AnimatorListenerAdapter() {
@@ -166,6 +176,14 @@ public class AnimUtils {
                 item.setTranslationY(0f);
             }
         });
+
+     /*   anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                item.setVisibility(View.INVISIBLE);
+            }
+        });*/
 
         return anim;
     }
