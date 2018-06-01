@@ -23,6 +23,9 @@ public class AnimUtils {
     public static final String TRANSLATION_X = "translationX";
     public static final String TRANSLATION_Y = "translationY";
 
+
+
+
     private AnimUtils() {
         //No instances.
     }
@@ -47,33 +50,33 @@ public class AnimUtils {
         return PropertyValuesHolder.ofFloat(SCALE_Y, values);
     }
 
-    public static void showMenu(ArcLayout arcLayout, float x, float y) {
-        showMenu(null,arcLayout,x,y);
+    public static void showMenu(ArcLayout arcLayout, float x, float y, ArcMenuAnimator arcMenuAnimator) {
+        showMenu(null,arcLayout,x,y,arcMenuAnimator);
     }
 
-    public static void hideMenu(ArcLayout arcLayout, float x, float y) {
-        hideMenu(null,arcLayout,x,y);
+    public static void hideMenu(ArcLayout arcLayout, float x, float y, ArcMenuAnimator arcMenuAnimator) {
+        hideMenu(null,arcLayout,x,y,arcMenuAnimator);
     }
 
-    public static void showMenu(ArcLayout arcLayout, View fab) {
-        showMenu(null,arcLayout,fab.getX(),fab.getY());
+    public static void showMenu(ArcLayout arcLayout, View fab, ArcMenuAnimator arcMenuAnimator) {
+        showMenu(null,arcLayout,fab.getX(),fab.getY(),arcMenuAnimator);
     }
 
-    public static void hideMenu(View menuLayout, ArcLayout arcLayout, View fab) {
-        hideMenu(menuLayout,arcLayout,fab.getX(),fab.getY());
+    public static void hideMenu(View menuLayout, ArcLayout arcLayout, View fab, ArcMenuAnimator arcMenuAnimator) {
+        hideMenu(menuLayout,arcLayout,fab.getX(),fab.getY(),arcMenuAnimator);
     }
 
-    public static void showMenu(View menuLayout, ArcLayout arcLayout, View fab) {
-        showMenu(menuLayout,arcLayout,fab.getX(),fab.getY());
+    public static void showMenu(View menuLayout, ArcLayout arcLayout, View fab, ArcMenuAnimator arcMenuAnimator) {
+        showMenu(menuLayout,arcLayout,fab.getX(),fab.getY(),arcMenuAnimator);
     }
 
-    public static void hideMenu(ArcLayout arcLayout, View fab) {
-        hideMenu(null,arcLayout,fab.getX(),fab.getY());
+    public static void hideMenu(ArcLayout arcLayout, View fab, ArcMenuAnimator arcMenuAnimator) {
+        hideMenu(null,arcLayout,fab.getX(),fab.getY(),arcMenuAnimator);
     }
 
 //    @SuppressWarnings("NewApi")
 //public static void showMenu(View menuLayout, ArcLayout arcLayout, View fab) {
-    public static void showMenu(View menuLayout, ArcLayout arcLayout, float x, float y) {
+    public static void showMenu(View menuLayout, ArcLayout arcLayout, float x, float y, ArcMenuAnimator arcMenuAnimator) {
 
         if(menuLayout!=null) {
             menuLayout.setVisibility(View.VISIBLE);
@@ -82,30 +85,70 @@ public class AnimUtils {
         List<Animator> animList = new ArrayList<>();
 
         for (int i = 0, len = arcLayout.getChildCount(); i < len; i++) {
-            animList.add(createShowItemAnimator(arcLayout.getChildAt(i), x,y));
+
+            switch (arcMenuAnimator.getAnimType()) {
+                case ArcMenuAnimator.ANIM_TYPE.ROTATION_TRANSLATE:
+                    animList.add(createShowItemAnimator(arcLayout.getChildAt(i), x, y));
+                    break;
+                case ArcMenuAnimator.ANIM_TYPE.FADE:
+                    animList.add(createShowItemAnimatorFadeIn(arcLayout.getChildAt(i)));
+                    break;
+                default:
+                    animList.add(createShowItemAnimator(arcLayout.getChildAt(i), x, y));
+            }
         }
 
         AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(400);
+        animSet.setDuration(arcMenuAnimator.getAnimShowDuration());
         animSet.setInterpolator(new OvershootInterpolator());
-        animSet.playTogether(animList);
+
+        switch (arcMenuAnimator.getAnimPlayMode()){
+            case ArcMenuAnimator.ANIM_PLAY_MODE.TOGETHER:
+                animSet.playTogether(animList);
+                break;
+            case ArcMenuAnimator.ANIM_PLAY_MODE.SEQUENTIAL:
+                animSet.playSequentially(animList);
+                break;
+            default:
+                animSet.playTogether(animList);
+        }
+
         animSet.start();
     }
 
  //   @SuppressWarnings("NewApi")
 // public static void hideMenu(final View menuLayout, ArcLayout arcLayout, View fab)
-    public static void hideMenu(final View menuLayout, ArcLayout arcLayout, float x, float y) {
+    public static void hideMenu(final View menuLayout, ArcLayout arcLayout, float x, float y, ArcMenuAnimator arcMenuAnimator) {
 
         List<Animator> animList = new ArrayList<>();
 
         for (int i = arcLayout.getChildCount() - 1; i >= 0; i--) {
-            animList.add(createHideItemAnimator(arcLayout.getChildAt(i), x,y));
+            switch (arcMenuAnimator.getAnimType()) {
+                case ArcMenuAnimator.ANIM_TYPE.ROTATION_TRANSLATE:
+                    animList.add(createHideItemAnimator(arcLayout.getChildAt(i), x,y));
+                    break;
+                case ArcMenuAnimator.ANIM_TYPE.FADE:
+                    animList.add(createHideItemAnimatorFadeOut(arcLayout.getChildAt(i)));
+                    break;
+                default:
+                    animList.add(createHideItemAnimator(arcLayout.getChildAt(i), x,y));
+            }
+
         }
 
         AnimatorSet animSet = new AnimatorSet();
-        animSet.setDuration(400);
+        animSet.setDuration(arcMenuAnimator.getAnimHideDuration());
         animSet.setInterpolator(new AnticipateInterpolator());
-        animSet.playTogether(animList);
+        switch (arcMenuAnimator.getAnimPlayMode()){
+            case ArcMenuAnimator.ANIM_PLAY_MODE.TOGETHER:
+                animSet.playTogether(animList);
+                break;
+            case ArcMenuAnimator.ANIM_PLAY_MODE.SEQUENTIAL:
+                animSet.playSequentially(animList);
+                break;
+            default:
+                animSet.playTogether(animList);
+        }
         animSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -117,7 +160,6 @@ public class AnimUtils {
             }
         });
         animSet.start();
-
     }
 
     public static Animator createShowItemAnimator(View item, View fab) {
@@ -185,6 +227,34 @@ public class AnimUtils {
             }
         });*/
 
+        return anim;
+    }
+
+    public static Animator createShowItemAnimatorFadeIn(final View item) {
+
+        Animator anim = ObjectAnimator.ofFloat(item, View.ALPHA, 0f, 1f);
+        //  anim.setDuration(1000);
+        /*anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                //  item.setVisibility(View.VISIBLE);
+            }
+        });*/
+
+        return anim;
+    }
+
+    public static Animator createHideItemAnimatorFadeOut(final View item) {
+        Animator anim = ObjectAnimator.ofFloat(item, View.ALPHA, 1f, 0f);
+        // anim.setDuration(1000);
+        /*anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                //  item.setVisibility(View.INVISIBLE);
+            }
+        });*/
         return anim;
     }
 }

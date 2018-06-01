@@ -53,6 +53,16 @@ public class ArcLayout extends ViewGroup {
     private int arcParentId;
     private int arcAnchorId;
 
+    // Arc Menu Animator
+
+    private int animType;
+    private int animPlayMode;
+    private int animShowDuration;
+    private int animHideDuration;
+    private ArcMenuAnimator arcMenuAnimator;
+
+    private boolean isShowIcons = true;
+
     public ArcLayout(Context context) {
         this(context, null);
     }
@@ -89,8 +99,23 @@ public class ArcLayout extends ViewGroup {
                 R.styleable.arc_ArcLayout_arc_freeAngle, DEFAULT_FREE_ANGLE);
         boolean isArcReverseAngle = a.getBoolean(
                 R.styleable.arc_ArcLayout_arc_reverseAngle, DEFAULT_REVERSE_ANGLE);
+
+        // Praba Added
         int _arcAnchorID = a.getResourceId(R.styleable.arc_ArcLayout_arc_anchor, -1);
         int _arcParentID = a.getResourceId(R.styleable.arc_ArcLayout_arc_parent, -1);
+
+        boolean _isShowIcons = a.getBoolean(
+                R.styleable.arc_ArcLayout_arc_show_icons, true);
+
+
+        int _animType = a.getInt(R.styleable.arc_ArcLayout_arc_anim_type, ArcMenuAnimator.ANIM_TYPE.ROTATION_TRANSLATE);
+
+        int _animPlayMode = a.getInt(R.styleable.arc_ArcLayout_arc_anim_play_mode, ArcMenuAnimator.ANIM_PLAY_MODE.TOGETHER);
+
+        int _animShowDuration = a.getResourceId(R.styleable.arc_ArcLayout_arc_parent, ArcMenuAnimator.DEFAULT_ANIM_DURATION);
+        int _animHideDuration = a.getResourceId(R.styleable.arc_ArcLayout_arc_parent, ArcMenuAnimator.DEFAULT_ANIM_DURATION);
+        int _animDuration = a.getResourceId(R.styleable.arc_ArcLayout_arc_parent, -1);
+
         a.recycle();
 
 
@@ -105,6 +130,25 @@ public class ArcLayout extends ViewGroup {
         isReverseAngle = isArcReverseAngle;
         arcAnchorId = _arcAnchorID;
         arcParentId = _arcParentID;
+        isShowIcons = _isShowIcons;
+        animType = _animType;
+        animPlayMode = _animPlayMode;
+
+        if(_animDuration > 0){
+            animShowDuration = _animDuration;
+            animHideDuration = _animDuration;
+        } else {
+            animShowDuration = _animShowDuration;
+            animHideDuration = _animHideDuration;
+        }
+
+        arcMenuAnimator = new ArcMenuAnimator();
+        arcMenuAnimator.setAnimType(animType);
+        arcMenuAnimator.setAnimPlayMode(animPlayMode);
+        arcMenuAnimator.setAnimShowDuration(animShowDuration);
+        arcMenuAnimator.setAnimHideDuration(animHideDuration);
+
+
     }
 
     @Override
@@ -263,27 +307,27 @@ public class ArcLayout extends ViewGroup {
      */
 
     public void showMenu(@NonNull View menuLayout, @NonNull View fab){
-        AnimUtils.showMenu(menuLayout,this,fab);
+        AnimUtils.showMenu(menuLayout,this,fab,arcMenuAnimator);
     }
 
     public void hideMenu(@NonNull View menuLayout,@NonNull View fab){
-        AnimUtils.hideMenu(menuLayout,this,fab);
+        AnimUtils.hideMenu(menuLayout,this,fab,arcMenuAnimator);
     }
 
     public void showMenu(@NonNull View fab){
-        AnimUtils.showMenu(this,fab);
+        AnimUtils.showMenu(this,fab,arcMenuAnimator);
     }
 
     public void hideMenu(@NonNull View fab){
-        AnimUtils.hideMenu(this,fab);
+        AnimUtils.hideMenu(this,fab,arcMenuAnimator);
     }
 
     public void showMenu(float positionX, float positionY){
-        AnimUtils.showMenu(this,positionX,positionY);
+        AnimUtils.showMenu(this,positionX,positionY,arcMenuAnimator);
     }
 
     public void hideMenu(float positionX, float positionY){
-        AnimUtils.hideMenu(this,positionX,positionY);
+        AnimUtils.hideMenu(this,positionX,positionY,arcMenuAnimator);
     }
 
     /* End of Praba's Code */

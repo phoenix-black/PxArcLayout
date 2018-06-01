@@ -23,6 +23,18 @@
         <attr name="arc_reverseAngle" format="boolean" />
         <attr name="arc_anchor" format="reference" />
         <attr name="arc_parent" format="reference" />
+        <attr name="arc_show_icons" format="boolean" />
+        <attr name="arc_anim_type" format="enum" >
+            <enum name="rotation_translate" value="1"/>
+            <enum name="fade" value="2"/>
+        </attr>
+        <attr name="arc_anim_play_mode" format="enum" >
+            <enum name="together" value="1"/>
+            <enum name="sequential" value="2"/>
+        </attr>
+        <attr name="arc_anim_show_duraion" format="integer" />
+        <attr name="arc_anim_hide_duraion" format="integer" />
+        <attr name="arc_anim_duraion" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="arc_ArcLayout_Layout">
